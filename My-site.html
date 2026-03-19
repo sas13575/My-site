@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>موقعي</title>
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    text-align: center;
+    background: #111;
+    color: white;
+}
+
+#adminBtn {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    width: 25px;
+    height: 25px;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#uploadSection {
+    display: none;
+    margin-top: 50px;
+}
+
+img {
+    max-width: 90%;
+    margin-top: 50px;
+}
+
+#footer {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="adminBtn"></div>
+
+<h1>مرحباً</h1>
+
+<img id="displayImage" src="" alt="">
+
+<div id="uploadSection">
+    <input type="file" id="imageInput" accept="image/*"><br><br>
+    <button onclick="uploadImage()">رفع الصورة</button>
+</div>
+
+<div id="footer">كل عام وأنتم بخير من سلطان</div>
+
+<script>
+const PASSWORD = "1234"; // غيره هنا
+
+// نحفظ الرابط
+let savedImage = localStorage.getItem("image_url");
+if (savedImage) {
+    document.getElementById("displayImage").src = savedImage;
+}
+
+document.getElementById("adminBtn").onclick = function() {
+    let code = prompt("ادخل الرمز:");
+    if (code === PASSWORD) {
+        document.getElementById("uploadSection").style.display = "block";
+    } else {
+        alert("رمز غلط!");
+    }
+};
+
+function uploadImage() {
+    let file = document.getElementById("imageInput").files[0];
+
+    if (!file) return;
+
+    let formData = new FormData();
+    formData.append("image", file);
+
+    fetch("https://api.imgur.com/3/image", {
+        method: "POST",
+        headers: {
+            Authorization: "Client-ID YOUR_CLIENT_ID"
+        },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        let url = data.data.link;
+        localStorage.setItem("image_url", url);
+        document.getElementById("displayImage").src = url;
+    })
+    .catch(() => alert("صار خطأ"));
+}
+</script>
+
+</body>
+</html>
